@@ -1,6 +1,6 @@
 package com.eduflow.eduflow.course.dto;
 
-import java.io.Serializable;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,8 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CourseResponse implements Serializable  {
-    private static final long serialVersionUID = 1L;
+public class CourseResponse   {
     private Long id;
     private String title;
     private String description;

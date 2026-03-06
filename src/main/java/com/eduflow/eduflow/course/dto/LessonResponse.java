@@ -1,6 +1,5 @@
 package com.eduflow.eduflow.course.dto;
 
-import java.io.Serializable;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,8 +10,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LessonResponse implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class LessonResponse  {
+   
     private Long id;
     private String title;
     private String contentUrl;
