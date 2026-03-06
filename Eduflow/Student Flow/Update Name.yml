@@ -1,0 +1,26 @@
+info:
+  name: Update Name
+  type: http
+  seq: 1
+
+http:
+  method: PUT
+  url: http://localhost:8080/api/users/me
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+          "name": "John Updated"
+      }
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huQGdtYWlsLmNvbSIsImlhdCI6MTc3MjQ3NjI0NSwiZXhwIjoxNzcyNTYyNjQ1fQ.i5HysT6v2r41EaLXM4ke2GAlcgA-eD8TaNhVKCZWtTE
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

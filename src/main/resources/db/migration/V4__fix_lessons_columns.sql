@@ -1,0 +1,1 @@
+ALTER TABLE lessons RENAME COLUMN is_free TO free;

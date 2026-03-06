@@ -1,0 +1,1 @@
+ALTER TABLE courses RENAME COLUMN is_published TO published;

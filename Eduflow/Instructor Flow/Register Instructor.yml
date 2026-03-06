@@ -1,0 +1,29 @@
+info:
+  name: Register Instructor
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8080/api/auth/register
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      
+
+      {
+          "name": "Jane Instructor",
+          "email": "jane@gmail.com",
+          "password": "123456",
+          "role": "INSTRUCTOR"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,37 @@
+{"properties": [
+  {
+    "name": "spring.flyway.clean-on-validation-error",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.flyway.clean-on-validation-error'"
+  },
+  {
+    "name": "jwt.secret",
+    "type": "java.lang.String",
+    "description": "A description for 'jwt.secret'"
+  },
+  {
+    "name": "jwt.expiration",
+    "type": "java.lang.String",
+    "description": "A description for 'jwt.expiration'"
+  },
+  {
+    "name": "aws.s3.access-key",
+    "type": "java.lang.String",
+    "description": "A description for 'aws.s3.access-key'"
+  },
+  {
+    "name": "aws.s3.secret-key",
+    "type": "java.lang.String",
+    "description": "A description for 'aws.s3.secret-key'"
+  },
+  {
+    "name": "aws.s3.bucket-name",
+    "type": "java.lang.String",
+    "description": "A description for 'aws.s3.bucket-name'"
+  },
+  {
+    "name": "aws.s3.region",
+    "type": "java.lang.String",
+    "description": "A description for 'aws.s3.region'"
+  }
+]}

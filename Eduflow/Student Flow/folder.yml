@@ -1,0 +1,7 @@
+info:
+  name: Student Flow
+  type: folder
+  seq: 1
+
+request:
+  auth: inherit

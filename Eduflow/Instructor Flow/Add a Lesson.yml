@@ -1,0 +1,31 @@
+info:
+  name: Add a Lesson
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: http://localhost:8080/api/courses/sections/2/lessons
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      
+      {
+          "title": "What is Node.js?",
+          "contentType": "VIDEO",
+          "duration": 300,
+          "orderIndex": 1,
+          "free": true
+      }
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqYW5lQGdtYWlsLmNvbSIsImlhdCI6MTc3MjU0Nzc2NywiZXhwIjoxNzcyNjM0MTY3fQ.xCujfMIN_VQrsUbWOM5SisCQwhmSZZNc39QhubjW9gQ
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,25 @@
+info:
+  name: Upload Course thumbnail
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: http://localhost:8080/api/courses/3/thumbnail
+  body:
+    type: multipart-form
+    data:
+      - name: file
+        type: file
+        value:
+          - D:\Iphone Photos\AAPF6589.JPG
+        contentType: File
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqYW5lQGdtYWlsLmNvbSIsImlhdCI6MTc3MjY5MTE5OCwiZXhwIjoxNzcyNzc3NTk4fQ.6FZ54SqR75E4NL6Z51YuAxu1anSkeTlH-wkYrgnY4pM
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
