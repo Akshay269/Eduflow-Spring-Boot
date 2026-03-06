@@ -5,13 +5,16 @@ info:
 
 http:
   method: GET
-  url: GET http://localhost:8080/api/courses?page=0&size=5
+  url: http://localhost:8080/api/courses?page=0&size=5&sortBy=title
   params:
     - name: page
       value: "0"
       type: query
     - name: size
       value: "5"
+      type: query
+    - name: sortBy
+      value: title
       type: query
   auth: inherit
 

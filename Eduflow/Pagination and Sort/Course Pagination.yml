@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: GET http://localhost:8080/api/courses?page=0&size=5
+  url: http://localhost:8080/api/courses?page=0&size=5
   params:
     - name: page
       value: "0"

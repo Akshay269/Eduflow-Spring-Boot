@@ -1,0 +1,27 @@
+info:
+  name: Update Review
+  type: http
+  seq: 3
+
+http:
+  method: PUT
+  url: http://localhost:8080/api/reviews/1
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+          "rating": 4,
+          "comment": "Great course but could use more examples."
+      }
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJicmlhbkBnbWFpbC5jb20iLCJpYXQiOjE3NzI3OTcwODQsImV4cCI6MTc3Mjg4MzQ4NH0.s5NOWhuKqadABiR_VBIOcfKpLQw3XjABYHweB4kBoXg
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

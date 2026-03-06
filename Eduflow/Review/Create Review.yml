@@ -1,0 +1,27 @@
+info:
+  name: Create Review
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8080/api/reviews/course/3
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+          "rating": 5,
+          "comment": "Excellent course! Learned a lot about Spring Boot."
+      }
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJicmlhbkBnbWFpbC5jb20iLCJpYXQiOjE3NzI3OTcwODQsImV4cCI6MTc3Mjg4MzQ4NH0.s5NOWhuKqadABiR_VBIOcfKpLQw3XjABYHweB4kBoXg
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

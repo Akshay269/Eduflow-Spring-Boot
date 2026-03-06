@@ -55,10 +55,12 @@ public class SecurityConfig {
                         "/api/auth/**",
                         "/api/courses",
                         "/api/courses/**",
-                        "/api/reviews/course/**",  
                         "/api/enrollments/check/**",
                         "/login/oauth2/**",
                         "/oauth2/**"
+                ).permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET,
+                        "/api/reviews/course/**" // ← GET only is public
                 ).permitAll()
                 .anyRequest().authenticated()
                 )
