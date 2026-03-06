@@ -6,6 +6,13 @@ info:
 http:
   method: GET
   url: http://localhost:8080/api/courses
+  headers:
+    - name: Accept
+      value: application/json
+  params:
+    - name: ""
+      value: ""
+      type: query
   auth: inherit
 
 settings:

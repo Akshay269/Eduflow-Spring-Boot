@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.eduflow.eduflow.common.response.ApiResponse;
+import com.eduflow.eduflow.common.response.PageResponse;
 import com.eduflow.eduflow.course.dto.CourseRequest;
 import com.eduflow.eduflow.course.dto.CourseResponse;
 import com.eduflow.eduflow.course.dto.LessonRequest;
@@ -36,11 +37,13 @@ public class CourseController {
     private final CourseService courseService;
 
     // ─── PUBLIC ENDPOINTS ───────────────────────────────────
-
     @GetMapping
-    public ResponseEntity<ApiResponse<List<CourseResponse>>> getAllCourses() {
+    public ResponseEntity<ApiResponse<PageResponse<CourseResponse>>> getAllCourses(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy) {
         return ResponseEntity.ok(ApiResponse.success("Courses fetched",
-                courseService.getAllPublishedCourses()));
+                courseService.getAllPublishedCourses(page, size, sortBy)));
     }
 
     @GetMapping("/{id}")
@@ -50,14 +53,17 @@ public class CourseController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<List<CourseResponse>>> searchCourses(
-            @RequestParam String keyword) {
+    public ResponseEntity<ApiResponse<PageResponse<CourseResponse>>> searchCourses(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String level,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(ApiResponse.success("Search results",
-                courseService.searchCourses(keyword)));
+                courseService.searchCourses(keyword, category, level, page, size)));
     }
 
     // ─── INSTRUCTOR ENDPOINTS ───────────────────────────────
-
     @PostMapping
     @PreAuthorize("hasRole('INSTRUCTOR')")
     public ResponseEntity<ApiResponse<CourseResponse>> createCourse(
@@ -96,7 +102,6 @@ public class CourseController {
     }
 
     // ─── SECTION ENDPOINTS ──────────────────────────────────
-
     @PostMapping("/{courseId}/sections")
     @PreAuthorize("hasRole('INSTRUCTOR')")
     public ResponseEntity<ApiResponse<SectionResponse>> addSection(
@@ -109,7 +114,6 @@ public class CourseController {
     }
 
     // ─── LESSON ENDPOINTS ───────────────────────────────────
-
     @PostMapping("/sections/{sectionId}/lessons")
     @PreAuthorize("hasRole('INSTRUCTOR')")
     public ResponseEntity<ApiResponse<LessonResponse>> addLesson(

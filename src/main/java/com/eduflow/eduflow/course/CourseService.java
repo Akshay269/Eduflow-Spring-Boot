@@ -3,10 +3,16 @@ package com.eduflow.eduflow.course;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.eduflow.eduflow.common.exception.ResourceNotFoundException;
+import com.eduflow.eduflow.common.response.PageResponse;
 import com.eduflow.eduflow.common.service.S3Service;
 import com.eduflow.eduflow.course.dto.CourseRequest;
 import com.eduflow.eduflow.course.dto.CourseResponse;
@@ -31,7 +37,6 @@ public class CourseService {
     private final UserRepository userRepository;
     private final S3Service s3Service;
 
-
     // ─── COURSE CRUD ────────────────────────────────────────
     public CourseResponse createCourse(CourseRequest request, String instructorEmail) {
         User instructor = userRepository.findByEmail(instructorEmail)
@@ -41,13 +46,14 @@ public class CourseService {
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .price(request.getPrice() != null ? request.getPrice() : BigDecimal.ZERO)
+                .category(request.getCategory())
+                .level(request.getLevel())
                 .instructor(instructor)
                 .build();
 
         return mapToCourseResponse(courseRepository.save(course));
     }
 
-   
     public CourseResponse uploadThumbnail(Long courseId, MultipartFile file, String email) {
         Course course = getCourseAndVerifyOwnership(courseId, email);
         String url = s3Service.uploadFile(file, "thumbnails");
@@ -55,7 +61,6 @@ public class CourseService {
         return mapToCourseResponse(courseRepository.save(course));
     }
 
- 
     public CourseResponse publishCourse(Long courseId, String email) {
         Course course = getCourseAndVerifyOwnership(courseId, email);
         course.setPublished(true);
@@ -68,10 +73,10 @@ public class CourseService {
         return mapToCourseResponse(course);
     }
 
-    public List<CourseResponse> getAllPublishedCourses() {
-         
-        return courseRepository.findByPublishedTrue()
-                .stream().map(this::mapToCourseResponse).toList();
+    public PageResponse<CourseResponse> getAllPublishedCourses(int page, int size, String sortBy) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        Page<Course> courses = courseRepository.findByPublishedTrue(pageable);
+        return PageResponse.from(courses.map(this::mapToCourseResponse));
     }
 
     public List<CourseResponse> getInstructorCourses(String email) {
@@ -81,9 +86,11 @@ public class CourseService {
                 .stream().map(this::mapToCourseResponse).toList();
     }
 
-    public List<CourseResponse> searchCourses(String keyword) {
-        return courseRepository.findByTitleContainingIgnoreCaseAndPublishedTrue(keyword)
-                .stream().map(this::mapToCourseResponse).toList();
+    public PageResponse<CourseResponse> searchCourses(
+            String keyword, String category, String level, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Course> courses = courseRepository.searchCourses(keyword, category, level, pageable);
+        return PageResponse.from(courses.map(this::mapToCourseResponse));
     }
 
     // ─── SECTION CRUD ────────────────────────────────────────
@@ -140,11 +147,6 @@ public class CourseService {
         }
         return course;
     }
-
-
-
-
-
 
     private CourseResponse mapToCourseResponse(Course course) {
         return CourseResponse.builder()

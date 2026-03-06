@@ -13,12 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name="courses")
+@Table(name = "courses")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Course {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -57,4 +58,16 @@ public class Course {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    @Column
+    private String category;   // e.g. "Programming", "Design", "Business"
+
+    @Column
+    private String level;
+
+    @Column(precision = 3, scale = 2)
+    private BigDecimal averageRating = BigDecimal.ZERO;
+
+    @Column
+    private Integer totalReviews = 0;
 }
