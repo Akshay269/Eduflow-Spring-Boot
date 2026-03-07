@@ -6,7 +6,7 @@ pipeline {
         DOCKER_TAG = "${BUILD_NUMBER}"
         EC2_HOST = '13.201.88.77'
         MAVEN_HOME = '/usr/share/maven'
-        PATH = "${MAVEN_HOME}/bin:${env.PATH}"
+        PATH = "${MAVEN_HOME}/bin:${PATH}"
     }
 
     stages {
@@ -35,8 +35,11 @@ pipeline {
         stage('Docker Build') {
             steps {
                 echo '🐳 Building Docker image...'
-                sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
-                sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
+
+                sh """
+                    docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+                    docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest
+                """
             }
         }
 
@@ -51,9 +54,11 @@ pipeline {
                         passwordVariable: 'DOCKER_PASS'
                     )
                 ]) {
-                    sh "echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin"
-                    sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
-                    sh "docker push ${DOCKER_IMAGE}:latest"
+                    sh """
+                        echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
+                        docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                        docker push ${DOCKER_IMAGE}:latest
+                    """
                 }
             }
         }
@@ -75,35 +80,43 @@ pipeline {
                     string(credentialsId: 'GOOGLE_CLIENT_SECRET', variable: 'GOOGLE_CLIENT_SECRET')
                 ]) {
 
+                    sh """
+                        cat > app.env <<EOF
+SPRING_DATASOURCE_URL=${DB_URL}
+SPRING_DATASOURCE_USERNAME=${DB_USER}
+SPRING_DATASOURCE_PASSWORD=${DB_PASS}
+JWT_SECRET=${JWT_SECRET}
+AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
+AWS_SECRET_KEY=${AWS_SECRET_KEY}
+AWS_BUCKET_NAME=${AWS_BUCKET_NAME}
+AWS_REGION=${AWS_REGION}
+GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+EOF
+                    """
+
                     sshagent(['ec2-ssh-key']) {
 
-                        sh '''
-                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} << EOF
+                        sh """
+                            scp -o StrictHostKeyChecking=no app.env ubuntu@${EC2_HOST}:/home/ubuntu/app.env
+                        """
 
-                        docker pull z9shay/eduflow:latest
-
-                        docker stop eduflow-app || true
-                        docker rm eduflow-app || true
-
-                        docker run -d \
-                            --name eduflow-app \
-                            --restart unless-stopped \
-                            -p 8080:8080 \
-                            -e SPRING_DATASOURCE_URL=$DB_URL \
-                            -e SPRING_DATASOURCE_USERNAME=$DB_USER \
-                            -e SPRING_DATASOURCE_PASSWORD=$DB_PASS \
-                            -e JWT_SECRET=$JWT_SECRET \
-                            -e AWS_ACCESS_KEY=$AWS_ACCESS_KEY \
-                            -e AWS_SECRET_KEY=$AWS_SECRET_KEY \
-                            -e AWS_BUCKET_NAME=$AWS_BUCKET_NAME \
-                            -e AWS_REGION=$AWS_REGION \
-                            -e GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
-                            -e GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET \
-                            z9shay/eduflow:latest
-
-                        EOF
-                        '''
+                        sh """
+                            ssh -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} '
+                                docker pull ${DOCKER_IMAGE}:latest &&
+                                docker stop eduflow-app || true &&
+                                docker rm eduflow-app || true &&
+                                docker run -d \\
+                                    --name eduflow-app \\
+                                    --restart unless-stopped \\
+                                    -p 8080:8080 \\
+                                    --env-file /home/ubuntu/app.env \\
+                                    ${DOCKER_IMAGE}:latest
+                            '
+                        """
                     }
+
+                    sh 'rm -f app.env'
                 }
             }
         }
