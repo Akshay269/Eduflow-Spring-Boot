@@ -4,21 +4,14 @@ info:
   seq: 4
 
 http:
-  method: PUT
-  url: http://localhost:8080/api/reviews/1
-  headers:
-    - name: Content-Type
-      value: application/json
+  method: GET
+  url: http://localhost:8080/api/reviews/courses/3
   body:
     type: json
-    data: |-
-      {
-          "rating": 4,
-          "comment": "Great course but could use more examples."
-      }
+    data: ""
   auth:
     type: bearer
-    token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJicmlhbkBnbWFpbC5jb20iLCJpYXQiOjE3NzI3OTcwODQsImV4cCI6MTc3Mjg4MzQ4NH0.s5NOWhuKqadABiR_VBIOcfKpLQw3XjABYHweB4kBoXg
+    token: ""
 
 settings:
   encodeUrl: true
