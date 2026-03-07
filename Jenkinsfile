@@ -10,6 +10,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 echo '🔄 Checking out code...'
@@ -42,12 +43,15 @@ pipeline {
         stage('Docker Push') {
             steps {
                 echo '📦 Pushing to Docker Hub...'
-                withCredentials([usernamePassword(
+
+                withCredentials([
+                    usernamePassword(
                         credentialsId: 'dockerhub-credentials',
                         usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
-                )]) {
-                    sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
+                    )
+                ]) {
+                    sh "echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin"
                     sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
                     sh "docker push ${DOCKER_IMAGE}:latest"
                 }
@@ -57,42 +61,48 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo '🚀 Deploying to EC2...'
+
                 withCredentials([
-                        string(credentialsId: 'SPRING_DATASOURCE_URL', variable: 'DB_URL'),
-                        string(credentialsId: 'SPRING_DATASOURCE_USERNAME', variable: 'DB_USER'),
-                        string(credentialsId: 'SPRING_DATASOURCE_PASSWORD', variable: 'DB_PASS'),
-                        string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
-                        string(credentialsId: 'AWS_ACCESS_KEY', variable: 'AWS_ACCESS_KEY'),
-                        string(credentialsId: 'AWS_SECRET_KEY', variable: 'AWS_SECRET_KEY'),
-                        string(credentialsId: 'AWS_BUCKET_NAME', variable: 'AWS_BUCKET_NAME'),
-                        string(credentialsId: 'AWS_REGION', variable: 'AWS_REGION'),
-                        string(credentialsId: 'GOOGLE_CLIENT_ID', variable: 'GOOGLE_CLIENT_ID'),
-                        string(credentialsId: 'GOOGLE_CLIENT_SECRET', variable: 'GOOGLE_CLIENT_SECRET')
+                    string(credentialsId: 'SPRING_DATASOURCE_URL', variable: 'DB_URL'),
+                    string(credentialsId: 'SPRING_DATASOURCE_USERNAME', variable: 'DB_USER'),
+                    string(credentialsId: 'SPRING_DATASOURCE_PASSWORD', variable: 'DB_PASS'),
+                    string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
+                    string(credentialsId: 'AWS_ACCESS_KEY', variable: 'AWS_ACCESS_KEY'),
+                    string(credentialsId: 'AWS_SECRET_KEY', variable: 'AWS_SECRET_KEY'),
+                    string(credentialsId: 'AWS_BUCKET_NAME', variable: 'AWS_BUCKET_NAME'),
+                    string(credentialsId: 'AWS_REGION', variable: 'AWS_REGION'),
+                    string(credentialsId: 'GOOGLE_CLIENT_ID', variable: 'GOOGLE_CLIENT_ID'),
+                    string(credentialsId: 'GOOGLE_CLIENT_SECRET', variable: 'GOOGLE_CLIENT_SECRET')
                 ]) {
-                    /* groovylint-disable-next-line NestedBlockDepth */
+
                     sshagent(['ec2-ssh-key']) {
-                        sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} '
-                            docker pull ${DOCKER_IMAGE}:latest &&
-                            docker stop eduflow-app || true &&
-                            docker rm eduflow-app || true &&
-                            docker run -d \
-                                --name eduflow-app \
-                                --restart unless-stopped \
-                                -p 8080:8080 \
-                                -e SPRING_DATASOURCE_URL=\${DB_URL} \
-                                -e SPRING_DATASOURCE_USERNAME=\${DB_USER} \
-                                -e SPRING_DATASOURCE_PASSWORD=\${DB_PASS} \
-                                -e JWT_SECRET=\${JWT_SECRET} \
-                                -e AWS_ACCESS_KEY=\${AWS_ACCESS_KEY} \
-                                -e AWS_SECRET_KEY=\${AWS_SECRET_KEY} \
-                                -e AWS_BUCKET_NAME=\${AWS_BUCKET_NAME} \
-                                -e AWS_REGION=\${AWS_REGION} \
-                                -e GOOGLE_CLIENT_ID=\${GOOGLE_CLIENT_ID} \
-                                -e GOOGLE_CLIENT_SECRET=\${GOOGLE_CLIENT_SECRET} \
-                                ${DOCKER_IMAGE}:latest
-                        '
-                    """
+
+                        sh '''
+                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} << EOF
+
+                        docker pull z9shay/eduflow:latest
+
+                        docker stop eduflow-app || true
+                        docker rm eduflow-app || true
+
+                        docker run -d \
+                            --name eduflow-app \
+                            --restart unless-stopped \
+                            -p 8080:8080 \
+                            -e SPRING_DATASOURCE_URL=$DB_URL \
+                            -e SPRING_DATASOURCE_USERNAME=$DB_USER \
+                            -e SPRING_DATASOURCE_PASSWORD=$DB_PASS \
+                            -e JWT_SECRET=$JWT_SECRET \
+                            -e AWS_ACCESS_KEY=$AWS_ACCESS_KEY \
+                            -e AWS_SECRET_KEY=$AWS_SECRET_KEY \
+                            -e AWS_BUCKET_NAME=$AWS_BUCKET_NAME \
+                            -e AWS_REGION=$AWS_REGION \
+                            -e GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
+                            -e GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET \
+                            z9shay/eduflow:latest
+
+                        EOF
+                        '''
                     }
                 }
             }
@@ -103,9 +113,11 @@ pipeline {
         success {
             echo '✅ Pipeline completed successfully!'
         }
+
         failure {
             echo '❌ Pipeline failed!'
         }
+
         always {
             sh 'docker image prune -f'
         }
