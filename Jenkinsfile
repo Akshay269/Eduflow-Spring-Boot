@@ -43,9 +43,9 @@ pipeline {
             steps {
                 echo '📦 Pushing to Docker Hub...'
                 withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-credentials',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
                 )]) {
                     sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
                     sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
@@ -57,8 +57,21 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo '🚀 Deploying to EC2...'
-                sshagent(['ec2-ssh-key']) {
-                    sh """
+                withCredentials([
+                        string(credentialsId: 'SPRING_DATASOURCE_URL', variable: 'DB_URL'),
+                        string(credentialsId: 'SPRING_DATASOURCE_USERNAME', variable: 'DB_USER'),
+                        string(credentialsId: 'SPRING_DATASOURCE_PASSWORD', variable: 'DB_PASS'),
+                        string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
+                        string(credentialsId: 'AWS_ACCESS_KEY', variable: 'AWS_ACCESS_KEY'),
+                        string(credentialsId: 'AWS_SECRET_KEY', variable: 'AWS_SECRET_KEY'),
+                        string(credentialsId: 'AWS_BUCKET_NAME', variable: 'AWS_BUCKET_NAME'),
+                        string(credentialsId: 'AWS_REGION', variable: 'AWS_REGION'),
+                        string(credentialsId: 'GOOGLE_CLIENT_ID', variable: 'GOOGLE_CLIENT_ID'),
+                        string(credentialsId: 'GOOGLE_CLIENT_SECRET', variable: 'GOOGLE_CLIENT_SECRET')
+                ]) {
+                    /* groovylint-disable-next-line NestedBlockDepth */
+                    sshagent(['ec2-ssh-key']) {
+                        sh """
                         ssh -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} '
                             docker pull ${DOCKER_IMAGE}:latest &&
                             docker stop eduflow-app || true &&
@@ -80,6 +93,7 @@ pipeline {
                                 ${DOCKER_IMAGE}:latest
                         '
                     """
+                    }
                 }
             }
         }
