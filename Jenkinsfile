@@ -58,9 +58,9 @@ pipeline {
             steps {
                 echo '🚀 Deploying to EC2...'
                 withCredentials([
-                        string(credentialsId: 'SPRING_DATASOURCE_URL', variable: 'DB_URL'),
-                        string(credentialsId: 'SPRING_DATASOURCE_USERNAME', variable: 'DB_USER'),
-                        string(credentialsId: 'SPRING_DATASOURCE_PASSWORD', variable: 'DB_PASS'),
+                        string(credentialsId: 'SPRING_DATASOURCE_URL', variable: 'SPRING_DATASOURCE_URL'),
+                        string(credentialsId: 'SPRING_DATASOURCE_USERNAME', variable: 'SPRING_DATASOURCE_USERNAME'),
+                        string(credentialsId: 'SPRING_DATASOURCE_PASSWORD', variable: 'SPRING_DATASOURCE_PASSWORD'),
                         string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
                         string(credentialsId: 'AWS_ACCESS_KEY', variable: 'AWS_ACCESS_KEY'),
                         string(credentialsId: 'AWS_SECRET_KEY', variable: 'AWS_SECRET_KEY'),
