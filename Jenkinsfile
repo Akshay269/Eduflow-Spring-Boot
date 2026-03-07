@@ -58,9 +58,9 @@ pipeline {
             steps {
                 echo '🚀 Deploying to EC2...'
                 withCredentials([
-                        string(credentialsId: 'SPRING_DATASOURCE_URL', variable: 'SPRING_DATASOURCE_URL'),
-                        string(credentialsId: 'SPRING_DATASOURCE_USERNAME', variable: 'SPRING_DATASOURCE_USERNAME'),
-                        string(credentialsId: 'SPRING_DATASOURCE_PASSWORD', variable: 'SPRING_DATASOURCE_PASSWORD'),
+                        string(credentialsId: 'SPRING_DATASOURCE_URL', variable: 'DB_URL'),
+                        string(credentialsId: 'SPRING_DATASOURCE_USERNAME', variable: 'DB_USER'),
+                        string(credentialsId: 'SPRING_DATASOURCE_PASSWORD', variable: 'DB_PASS'),
                         string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
                         string(credentialsId: 'AWS_ACCESS_KEY', variable: 'AWS_ACCESS_KEY'),
                         string(credentialsId: 'AWS_SECRET_KEY', variable: 'AWS_SECRET_KEY'),
@@ -80,9 +80,9 @@ pipeline {
                                 --name eduflow-app \
                                 --restart unless-stopped \
                                 -p 8080:8080 \
-                                -e SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL} \
-                                -e SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME} \
-                                -e SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD} \
+                                -e SPRING_DATASOURCE_URL=${DB_URL} \
+                                -e SPRING_DATASOURCE_USERNAME=${DB_USER} \
+                                -e SPRING_DATASOURCE_PASSWORD=${DB_PASS} \
                                 -e JWT_SECRET=${JWT_SECRET} \
                                 -e AWS_ACCESS_KEY=${AWS_ACCESS_KEY} \
                                 -e AWS_SECRET_KEY=${AWS_SECRET_KEY} \
