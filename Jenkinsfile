@@ -80,16 +80,16 @@ pipeline {
                                 --name eduflow-app \
                                 --restart unless-stopped \
                                 -p 8080:8080 \
-                                -e SPRING_DATASOURCE_URL=${DB_URL} \
-                                -e SPRING_DATASOURCE_USERNAME=${DB_USER} \
-                                -e SPRING_DATASOURCE_PASSWORD=${DB_PASS} \
-                                -e JWT_SECRET=${JWT_SECRET} \
-                                -e AWS_ACCESS_KEY=${AWS_ACCESS_KEY} \
-                                -e AWS_SECRET_KEY=${AWS_SECRET_KEY} \
-                                -e AWS_BUCKET_NAME=${AWS_BUCKET_NAME} \
-                                -e AWS_REGION=${AWS_REGION} \
-                                -e GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} \
-                                -e GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET} \
+                                -e SPRING_DATASOURCE_URL=\${DB_URL} \
+                                -e SPRING_DATASOURCE_USERNAME=\${DB_USER} \
+                                -e SPRING_DATASOURCE_PASSWORD=\${DB_PASS} \
+                                -e JWT_SECRET=\${JWT_SECRET} \
+                                -e AWS_ACCESS_KEY=\${AWS_ACCESS_KEY} \
+                                -e AWS_SECRET_KEY=\${AWS_SECRET_KEY} \
+                                -e AWS_BUCKET_NAME=\${AWS_BUCKET_NAME} \
+                                -e AWS_REGION=\${AWS_REGION} \
+                                -e GOOGLE_CLIENT_ID=\${GOOGLE_CLIENT_ID} \
+                                -e GOOGLE_CLIENT_SECRET=\${GOOGLE_CLIENT_SECRET} \
                                 ${DOCKER_IMAGE}:latest
                         '
                     """
