@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduFlow AWS Infrastructure</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg: #0a0e1a;
+    --surface: #0f1629;
+    --border: #1e2d4a;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --accent4: #f59e0b;
+    --accent5: #ef4444;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --aws-orange: #ff9900;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 10% 10%, rgba(0,212,255,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 80%, rgba(124,58,237,0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .header h1 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header p {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 8px;
+    letter-spacing: 0.05em;
+  }
+  .badge {
+    display: inline-block;
+    background: rgba(255,153,0,0.1);
+    border: 1px solid rgba(255,153,0,0.3);
+    color: var(--aws-orange);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    letter-spacing: 0.1em;
+  }
+
+  /* Flow layout */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    align-items: center;
+  }
+
+  /* Sections */
+  .section {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    background: var(--surface);
+    position: relative;
+    margin-bottom: 8px;
+  }
+
+  .section-label {
+    position: absolute;
+    top: -11px;
+    left: 20px;
+    background: var(--surface);
+    padding: 0 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .section.internet { border-color: rgba(0,212,255,0.3); }
+  .section.internet .section-label { color: var(--accent); }
+
+  .section.vpc { border-color: rgba(255,153,0,0.4); border-width: 2px; padding: 28px; }
+  .section.vpc .section-label { color: var(--aws-orange); font-size: 0.75rem; }
+
+  .section.public-subnet { border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.03); }
+  .section.public-subnet .section-label { color: var(--accent3); }
+
+  .section.private-subnet { border-color: rgba(124,58,237,0.3); background: rgba(124,58,237,0.03); }
+  .section.private-subnet .section-label { color: var(--accent2); }
+
+  .section.cicd { border-color: rgba(245,158,11,0.3); }
+  .section.cicd .section-label { color: var(--accent4); }
+
+  /* Nodes row */
+  .nodes {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+  }
+
+  /* Individual node */
+  .node {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    min-width: 150px;
+    text-align: center;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: default;
+  }
+  .node:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  .node-icon {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .node-title {
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+  .node-detail {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .node-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-top: 6px;
+    font-weight: 600;
+  }
+
+  /* Node color variants */
+  .node.blue { border-color: rgba(0,212,255,0.3); }
+  .node.blue .node-tag { background: rgba(0,212,255,0.1); color: var(--accent); }
+
+  .node.green { border-color: rgba(16,185,129,0.3); }
+  .node.green .node-tag { background: rgba(16,185,129,0.1); color: var(--accent3); }
+
+  .node.purple { border-color: rgba(124,58,237,0.3); }
+  .node.purple .node-tag { background: rgba(124,58,237,0.1); color: var(--accent2); }
+
+  .node.orange { border-color: rgba(255,153,0,0.3); }
+  .node.orange .node-tag { background: rgba(255,153,0,0.1); color: var(--aws-orange); }
+
+  .node.yellow { border-color: rgba(245,158,11,0.3); }
+  .node.yellow .node-tag { background: rgba(245,158,11,0.1); color: var(--accent4); }
+
+  .node.red { border-color: rgba(239,68,68,0.3); }
+  .node.red .node-tag { background: rgba(239,68,68,0.1); color: var(--accent5); }
+
+  /* Arrows */
+  .arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 4px 0;
+    gap: 2px;
+  }
+  .arrow-line {
+    width: 2px;
+    height: 24px;
+    background: linear-gradient(to bottom, var(--border), var(--accent));
+    opacity: 0.6;
+  }
+  .arrow-head {
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid var(--accent);
+    opacity: 0.6;
+  }
+  .arrow-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-top: 2px;
+  }
+
+  /* Subnet row inside VPC */
+  .subnet-row {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+  }
+  .subnet-row .section {
+    flex: 1;
+    margin-bottom: 0;
+  }
+
+  /* CI/CD flow horizontal */
+  .cicd-flow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .cicd-step {
+    background: rgba(245,158,11,0.06);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .cicd-arrow {
+    color: var(--accent4);
+    font-size: 1rem;
+    opacity: 0.7;
+  }
+
+  /* VPC inner spacing */
+  .vpc-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 32px;
+    padding: 16px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  /* VPC border highlight */
+  .vpc {
+    background: linear-gradient(135deg, rgba(255,153,0,0.03), rgba(255,153,0,0.01));
+  }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    .subnet-row { flex-direction: column; }
+    .nodes { flex-direction: column; align-items: center; }
+    .cicd-flow { flex-direction: column; }
+    .cicd-arrow { transform: rotate(90deg); }
+    .header h1 { font-size: 1.6rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="badge">☁️ AWS INFRASTRUCTURE</div>
+    <h1>EduFlow Deployment Architecture</h1>
+    <p>ap-south-1 (Mumbai) · VPC: 10.0.0.0/16 · EC2 + RDS + S3 + CI/CD</p>
+  </div>
+
+  <div class="flow">
+
+    <!-- Internet / Users -->
+    <div class="section internet">
+      <span class="section-label">🌐 Internet</span>
+      <div class="nodes">
+        <div class="node blue">
+          <span class="node-icon">👤</span>
+          <div class="node-title">Users / Clients</div>
+          <div class="node-detail">Bruno / Postman<br>Web / Mobile</div>
+          <span class="node-tag">HTTP Requests</span>
+        </div>
+        <div class="node blue">
+          <span class="node-icon">🐙</span>
+          <div class="node-title">GitHub</div>
+          <div class="node-detail">Source Code<br>Webhooks</div>
+          <span class="node-tag">git push → trigger</span>
+        </div>
+        <div class="node blue">
+          <span class="node-icon">🐳</span>
+          <div class="node-title">Docker Hub</div>
+          <div class="node-detail">z9shay/eduflow<br>Container Registry</div>
+          <span class="node-tag">:latest / :build#</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">
+      <div class="arrow-line"></div>
+      <div class="arrow-head"></div>
+      <div class="arrow-label">HTTPS / SSH</div>
+    </div>
+
+    <!-- AWS VPC -->
+    <div class="section vpc">
+      <span class="section-label">🟠 AWS VPC — eduflow-vpc (10.0.0.0/16) · ap-south-1</span>
+      <div class="vpc-inner">
+
+        <!-- Internet Gateway -->
+        <div style="text-align:center;">
+          <div class="node orange" style="display:inline-block; min-width:200px;">
+            <span class="node-icon">🚪</span>
+            <div class="node-title">Internet Gateway</div>
+            <div class="node-detail">eduflow-igw<br>0.0.0.0/0 → IGW</div>
+            <span class="node-tag">Route Table attached</span>
+          </div>
+        </div>
+
+        <div class="arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-head"></div>
+        </div>
+
+        <!-- Public + Private Subnets -->
+        <div class="subnet-row">
+
+          <!-- Public Subnet -->
+          <div class="section public-subnet">
+            <span class="section-label">🟢 Public Subnet · ap-south-1a · 10.0.1.0/24</span>
+            <div class="nodes" style="justify-content:center;">
+              <div class="node green">
+                <span class="node-icon">⚙️</span>
+                <div class="node-title">Jenkins Server</div>
+                <div class="node-detail">EC2 c7i-flex.large<br>Ubuntu 22.04<br>IP: 13.201.88.77<br>Port: 9090</div>
+                <span class="node-tag">CI/CD Engine</span>
+              </div>
+              <div class="node green">
+                <span class="node-icon">🚀</span>
+                <div class="node-title">EduFlow App</div>
+                <div class="node-detail">Docker Container<br>Spring Boot 4.0<br>Java 21<br>Port: 8080</div>
+                <span class="node-tag">API Server</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Private Subnet -->
+          <div class="section private-subnet">
+            <span class="section-label">🟣 Private Subnets · 10.0.2.0/24 · 10.0.3.0/24</span>
+            <div class="nodes" style="justify-content:center;">
+              <div class="node purple">
+                <span class="node-icon">🗄️</span>
+                <div class="node-title">AWS RDS</div>
+                <div class="node-detail">PostgreSQL 16<br>db.t3.micro<br>eduflow_db<br>Port: 5432</div>
+                <span class="node-tag">Managed DB</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Security Groups -->
+        <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:8px;">
+          <div class="node orange" style="min-width:180px;">
+            <span class="node-icon">🔒</span>
+            <div class="node-title">jenkins-sg</div>
+            <div class="node-detail">SSH :22 (My IP)<br>:9090 (0.0.0.0/0)<br>:8080 (0.0.0.0/0)</div>
+            <span class="node-tag">Security Group</span>
+          </div>
+          <div class="node orange" style="min-width:180px;">
+            <span class="node-icon">🔒</span>
+            <div class="node-title">rds-sg</div>
+            <div class="node-detail">PostgreSQL :5432<br>Source: jenkins-sg<br>Private only</div>
+            <span class="node-tag">Security Group</span>
+          </div>
+          <div class="node orange" style="min-width:180px;">
+            <span class="node-icon">👤</span>
+            <div class="node-title">IAM Role</div>
+            <div class="node-detail">jenkins-ec2-role<br>ECR + ECS + S3<br>SecretsManager</div>
+            <span class="node-tag">Permissions</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="arrow">
+      <div class="arrow-line"></div>
+      <div class="arrow-head"></div>
+    </div>
+
+    <!-- AWS Services -->
+    <div class="section" style="border-color: rgba(0,212,255,0.2);">
+      <span class="section-label" style="color: var(--accent);">☁️ AWS Managed Services</span>
+      <div class="nodes">
+        <div class="node blue">
+          <span class="node-icon">🪣</span>
+          <div class="node-title">AWS S3</div>
+          <div class="node-detail">File Uploads<br>Course Thumbnails<br>Profile Images</div>
+          <span class="node-tag">Object Storage</span>
+        </div>
+        <div class="node blue">
+          <span class="node-icon">🔐</span>
+          <div class="node-title">Secrets Manager</div>
+          <div class="node-detail">JWT Secret<br>DB Credentials<br>OAuth Keys</div>
+          <span class="node-tag">Secrets</span>
+        </div>
+        <div class="node blue">
+          <span class="node-icon">📊</span>
+          <div class="node-title">CloudWatch</div>
+          <div class="node-detail">Logs & Metrics<br>EC2 Monitoring<br>RDS Metrics</div>
+          <span class="node-tag">Observability</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">
+      <div class="arrow-line"></div>
+      <div class="arrow-head"></div>
+    </div>
+
+    <!-- CI/CD Pipeline -->
+    <div class="section cicd">
+      <span class="section-label">🔄 CI/CD Pipeline Flow</span>
+      <div class="cicd-flow">
+        <div class="cicd-step">📝<br>git push<br>GitHub</div>
+        <div class="cicd-arrow">→</div>
+        <div class="cicd-step">🔔<br>Webhook<br>Trigger</div>
+        <div class="cicd-arrow">→</div>
+        <div class="cicd-step">🔨<br>mvn build<br>Jenkins</div>
+        <div class="cicd-arrow">→</div>
+        <div class="cicd-step">🐳<br>Docker<br>Build</div>
+        <div class="cicd-arrow">→</div>
+        <div class="cicd-step">📦<br>Push to<br>Docker Hub</div>
+        <div class="cicd-arrow">→</div>
+        <div class="cicd-step">🚀<br>Deploy<br>EC2</div>
+        <div class="cicd-arrow">→</div>
+        <div class="cicd-step">✅<br>App<br>Live!</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#00d4ff"></div> Internet / External</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ff9900"></div> AWS VPC / IAM</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div> Public Subnet</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#7c3aed"></div> Private Subnet</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div> CI/CD Pipeline</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#64748b"></div> Managed Services</div>
+  </div>
+
+</div>
+</body>
+</html>

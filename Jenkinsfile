@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'z9shay/eduflow'
         DOCKER_TAG = "${BUILD_NUMBER}"
-        EC2_HOST = '13.201.88.77'
+        EC2_HOST = '65.1.160.19'
         MAVEN_HOME = '/usr/share/maven'
         PATH = "${MAVEN_HOME}/bin:${PATH}"
     }
