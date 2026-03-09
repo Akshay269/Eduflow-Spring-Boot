@@ -49,6 +49,7 @@ spring:
       client:
         registration:
           google:
+            redirect-uri: "https://d35qzhxh4jwgyd.cloudfront.net/login/oauth2/code/google"
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
             scope:
