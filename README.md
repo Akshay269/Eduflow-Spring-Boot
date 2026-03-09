@@ -658,16 +658,9 @@ Jenkinsfile
 | Mixed Content (HTTPS → HTTP) | Added CloudFront as HTTPS proxy for backend |
 | `redirect_uri_mismatch` Google OAuth | Added CloudFront URL to Google Console authorized URIs |
 
----
-
-## 📄 License
-
-MIT License — feel free to use this project for learning and reference.
-
----
 
 ## 🤝 Connect
 
 **Akshay Rahangdale**
 - GitHub: [@Akshay269](https://github.com/Akshay269)
-- LinkedIn: [your-linkedin-url]
+- LinkedIn: [Akshay Rahangdale](https://www.linkedin.com/in/akshayr2609/)
