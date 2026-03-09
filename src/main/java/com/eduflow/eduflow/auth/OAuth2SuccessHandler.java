@@ -36,7 +36,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         // Redirect to frontend with token as query param
         // In production this will be your React/Angular app URL
-        String redirectUrl = "http://localhost:3000/oauth2/callback?token=" + token;
+        String redirectUrl = "https://d3li9dplflwnfz.cloudfront.net/oauth2/callback?token=" + token;
         try {
             getRedirectStrategy().sendRedirect(request, response, redirectUrl);
         } catch (IOException e) {
