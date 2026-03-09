@@ -17,6 +17,7 @@ public class CorsConfig {
         
         config.setAllowedOrigins(Arrays.asList(
             "https://d3li9dplflwnfz.cloudfront.net",
+            "https://d35qzhxh4jwgyd.cloudfront.net",
             "http://localhost:5173"
         ));
         config.setAllowedMethods(Arrays.asList(
