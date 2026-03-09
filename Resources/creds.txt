@@ -19,3 +19,5 @@ Password: Student@123
 Categories: Programming, DevOps, Design, Data Science
 Levels: BEGINNER, INTERMEDIATE, ADVANCED
 Price range: $9.99 - $99.99
+
+https://claude.ai/public/artifacts/4bec5ef8-5beb-4475-bbb7-5c7ddd7145f5
