@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import com.eduflow.eduflow.auth.JwtAuthFilter;
 import com.eduflow.eduflow.auth.OAuth2SuccessHandler;
@@ -39,8 +40,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
             AuthenticationProvider authenticationProvider,
             OAuth2UserService oAuth2UserService,
-            OAuth2SuccessHandler oAuth2SuccessHandler) throws Exception {
+            OAuth2SuccessHandler oAuth2SuccessHandler,
+            CorsConfigurationSource corsConfigurationSource) throws Exception {
         http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(ex -> ex
                 .authenticationEntryPoint((request, response, authException) -> {
