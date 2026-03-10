@@ -7,6 +7,7 @@ pipeline {
         EC2_HOST = '65.1.160.19'
         MAVEN_HOME = '/usr/share/maven'
         PATH = "${MAVEN_HOME}/bin:${PATH}"
+
     }
 
     stages {
