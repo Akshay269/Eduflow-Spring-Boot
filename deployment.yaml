@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eduflow-app
+  namespace: eduflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eduflow
+  template:
+    metadata:
+      labels:
+        app: eduflow
+    spec:
+      containers:
+      - name: eduflow
+        image: z9shay/eduflow:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - secretRef:
+            name: eduflow-secrets

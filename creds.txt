@@ -1,0 +1,21 @@
+Email: john.instructor@eduflow.com
+Password: Instructor@123
+
+Email: sarah.instructor@eduflow.com
+Password: Instructor@123
+
+Email: mike.instructor@eduflow.com
+Password: Instructor@123
+
+Email: alice.student@eduflow.com
+Password: Student@123
+
+Email: bob.student@eduflow.com
+Password: Student@123
+
+Email: carol.student@eduflow.com
+Password: Student@123
+
+Categories: Programming, DevOps, Design, Data Science
+Levels: BEGINNER, INTERMEDIATE, ADVANCED
+Price range: $9.99 - $99.99

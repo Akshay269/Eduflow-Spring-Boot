@@ -1,7 +1,0 @@
-info:
-  name: Pagination and Sort
-  type: folder
-  seq: 6
-
-request:
-  auth: inherit
